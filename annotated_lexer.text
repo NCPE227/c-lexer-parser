@@ -16,19 +16,23 @@
 "("         {return LPAREN;}
 ")"         {return RPAREN;}
 
-"${"         {return DOLLAR;}
+"${"        {return DOLLAR;}
 "{"         {return LBRACE;}
 "}"         {return RBRACE;}
 
 "."         {return DOT;}
 
+/* Identifier */
 [a-zA-Z_][a-zA-Z0-9_]*  { return ID; }
 
+/* Single Literal Character */
 [a-zA-Z0-9] {yylval = yytext[0]; return CHAR;}
 
+/* Ignore Whitespace */
 [ \t\r\n]+     ;
 
-. {
+/* Anything not covered above is an error and should be reported */
+.{
     fprintf(stderr, "Unpexpected character: %s\n", yytext);
     return ERROR;
 }

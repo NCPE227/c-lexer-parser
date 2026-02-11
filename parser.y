@@ -6,18 +6,18 @@ int yylex(void);
 %}
 
 /* Tokens */
-%token CONST ID
-%token SLASH AMP NOT OR
+%token CONST ID LITERAL RANGE
+%token SLASH AMP NOT OR EQUALS
 %token STAR PLUS QUESTION
 %token LPAREN RPAREN
 %token DOT
-%token DOLLAR LBRACE RBRACE
-%token CHAR
+%token SUBSTART LBRACE RBRACE
 
 %%
 
 System :
       DefinitionList SLASH RootRegex SLASH
+      | DefinitionList // accounts for the case of having only a declaration
     ;
 
 DefinitionList :
@@ -26,15 +26,17 @@ DefinitionList :
     ;
 
 Definition :
-      CONST ID '=' SLASH Regex SLASH
+      CONST ID EQUALS SLASH Regex SLASH
     ;
 
+/* Boolean and Top Level Operations */
 RootRegex :
       RootRegex AMP RootRegex
     | NOT Regex
-    | Regex
+    | Alt
     ;
 
+/* Lowest regex precedence */
 Regex :
       Seq
     | Alt
@@ -43,29 +45,33 @@ Regex :
     | LPAREN Regex RPAREN
     ;
 
-Seq :
-      Regex
-    | Seq Regex
+Alt :
+      Seq
+      | Alt OR Seq
     ;
 
-Alt :
-      Regex OR Regex
+Seq :
+      Repeat
+    | Seq Repeat
     ;
 
 Repeat :
-      Regex STAR
-    | Regex PLUS
-    | Regex QUESTION
+      Term STAR
+    | Term PLUS
+    | Term QUESTION
+    | Term
     ;
 
 Term :
-      CHAR
+      LITERAL
+    | RANGE
     | DOT
     | Substitute
+    | LPAREN RootRegex RPAREN
     ;
 
 Substitute :
-      DOLLAR LBRACE ID RBRACE
+      SUBSTART ID RBRACE // recall that substart is the combination character of ${
     ;
 
 %%

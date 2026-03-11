@@ -3,4 +3,6 @@ project(LexerParser C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(LexerParser main.c)
+add_executable(LexerParser main.c
+        AST.c
+        AST.h)

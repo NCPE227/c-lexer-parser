@@ -17,7 +17,6 @@ int yylex(void);
 
 System :
       DefinitionList SLASH RootRegex SLASH
-      | DefinitionList // accounts for the case of having only a declaration
     ;
 
 DefinitionList :
@@ -56,9 +55,9 @@ Seq :
     ;
 
 Repeat :
-      Term STAR
-    | Term PLUS
-    | Term QUESTION
+      Repeat STAR
+    | Repeat PLUS
+    | Repeat QUESTION
     | Term
     ;
 

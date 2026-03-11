@@ -1,1 +1,2 @@
 const s_re = /[a-z]/
+/${s_re}/

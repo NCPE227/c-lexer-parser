@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include "AST.h"
+#include "AST.c"
 
 // From Bison
 int yyparse(void);
@@ -24,6 +26,14 @@ int main(int argc, char *argv[]) {
 
     // Run the parser
     int result = yyparse();
+    if (result != 0) {
+        return 1; // Syntax error handled by yyerror
+    }
+
+    // Pass 2: Check Semantics
+    if (ast_root != NULL) {
+        check_semantics(ast_root);
+    }
 
     // Check the result. Print "accepts" if its regex, or outputs errors if it isn't regex.
     if (result == 0) {

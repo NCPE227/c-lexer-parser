@@ -24,9 +24,22 @@
 
 "."         {return DOT;}
 
-\"([^\"%]|%x[0-9]+;)*\" { return LITERAL; } // defines a literal as any characters or escapes bounded by double quotations
-"["[^\]]*"]"        { return RANGE; } // defines range as escaped chars and ^ bounded by brackets
-[a-zA-Z_][a-zA-Z0-9_]*  { return ID; }
+// defines a literal as any characters or escapes bounded by double quotations
+\"([^\"%]|%x[0-9]+;)*\" {
+    yyval.str = strdup(yytext);
+    return LITERAL;
+}
+
+// defines range as escaped chars and ^ bounded by brackets
+"["[^\]]*"]"        {
+    yyval.str = strdup(yytext);
+    return RANGE;
+}
+
+[a-zA-Z_][a-zA-Z0-9_]*  {
+    yyval.str = strdup(yytext);
+    return ID;
+}
 
 [ \t\r\n]+     ; // skip extra whitespace
 

@@ -48,5 +48,6 @@ struct AST {
     } data;
 };
 
+extern AST *ast_root;
 
 #endif //LEXERPARSER_AST_H

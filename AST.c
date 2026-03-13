@@ -8,6 +8,8 @@
 
 #include <string.h>
 
+AST *ast_root = NULL;
+
 typedef struct StackTop {
     char *name;
     struct StackTop *next;
@@ -45,27 +47,23 @@ AST *make_unary(int tag, AST *child) {
 
 AST *make_string(int tag, char *val) {
     AST *node = (AST *) malloc(sizeof(AST));
-
-    if (node == NULL) {
-        fprintf(stderr, "Error!\n");
-        exit(1);
-    }
+    if (node == NULL) { exit(1); }
 
     node->tag = tag;
-    node->data.string.value = strdup(val);
+
+    // Safety check: if val is NULL, duplicate an empty string
+    node->data.string.value = (val != NULL) ? strdup(val) : strdup("");
     return node;
 }
 
 AST *make_def(int tag, char *name, AST *regex) {
     AST *node = (AST *) malloc(sizeof(AST));
-
-    if (node == NULL) {
-        fprintf(stderr, "Error!\n");
-        exit(1);
-    }
+    if (node == NULL) { exit(1); }
 
     node->tag = tag;
-    node->data.def.name = strdup(name);
+
+    // Safety check: if val is NULL, duplicate an empty string
+    node->data.def.name = (name != NULL) ? strdup(name) : strdup("");
     node->data.def.regex = regex;
     return node;
 }
@@ -98,7 +96,7 @@ void push_symbol(char *name) {
 }
 
 int find_symbol(char *name) {
-    StackTop *current = (StackTop *)malloc(sizeof(StackTop));
+    StackTop *current = stack_top;
 
     while (current != NULL) {
         if (strcmp(current->name, name) == 0) {
@@ -125,7 +123,7 @@ void validate_escapes(char *str) {
 
         // check if it exceeds the maximum unicode endpoint
         if (l_int > 0x10FFFF) {
-            fprintf(stderr, "Semantics Error: Hex escape %%x%lX is out of bounds.\n");
+            fprintf(stderr, "Semantics Error: Hex escape %%x%lX is out of bounds.\n", l_int);
             exit(1);
         }
 
@@ -140,7 +138,10 @@ void check_semantics(AST *node) {
         // Top Level
         case NODE_SYSTEM:
             check_semantics(node->data.system.def_list);
-            check_semantics(node->data.system.root_regex);
+            // Protect against files that only have definitions!
+            if (node->data.system.root_regex != NULL) {
+                check_semantics(node->data.system.root_regex);
+            }
             break;
 
         // Definitions

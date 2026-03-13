@@ -1,0 +1,4 @@
+const DIGIT = /["0"-"9"]/
+const INTEGER = /${DIGIT}+/
+const DECIMAL = /${INTEGER}.${INTEGER}/
+/${DECIMAL}/

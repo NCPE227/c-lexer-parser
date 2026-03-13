@@ -1,0 +1,3 @@
+const UPPERCASE = /"[%x41;-%x5A;]"/
+const MAX_UNICODE = /"%x10FFFF;"/
+/${UPPERCASE}/

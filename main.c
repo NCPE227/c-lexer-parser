@@ -1,46 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <string.h>
 #include "AST.h"
-#include "AST.c"
+#include "parser.tab.h"
 
-// From Bison
-int yyparse(void);
-
-// From Flex
 extern FILE *yyin;
 
-int main(int argc, char *argv[]) {
-    // Check for the correct number of arguments
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
+int main(int argc, char **argv) {
+    if (argc > 1) {
+        yyin = fopen(argv[1], "r");
+        if (!yyin) {
+            fprintf(stderr, "Could not open %s\n", argv[1]);
+            return 1;
+        }
     }
 
-    // Open the input file given by user if it exists
-    yyin = fopen(argv[1], "r");
-    if (!yyin) {
-        perror("fopen");
+    // CRITICAL: Exit immediately if a syntax error occurs!
+    if (yyparse() != 0) {
         return 1;
     }
 
-    // Run the parser
-    int result = yyparse();
-    if (result != 0) {
-        return 1; // Syntax error handled by yyerror
-    }
-
-    // Pass 2: Check Semantics
+    // If we survived parsing, check semantics
     if (ast_root != NULL) {
         check_semantics(ast_root);
     }
 
-    // Check the result. Print "accepts" if its regex, or outputs errors if it isn't regex.
-    if (result == 0) {
-        printf("accepts\n");
-        return 0;
-    }
-    else {
-        return 1;
-    }
+    printf("accepts\n");
+    return 0;
 }

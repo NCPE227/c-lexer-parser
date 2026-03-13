@@ -18,7 +18,7 @@ echo "---------------------------------------"
 echo "Running Valid Tests (Expecting Success)"
 echo "---------------------------------------"
 
-for test_file in tests/valid/*; do
+for test_file in regex tests/valid/*; do
     [ -e "$test_file" ] || continue
     total=$((total + 1))
 
@@ -44,7 +44,7 @@ echo "---------------------------------------"
 echo "Running Invalid Tests (Expecting Error)"
 echo "---------------------------------------"
 
-for test_file in tests/invalid/*; do
+for test_file in regex tests/invalid/*; do
     [ -e "$test_file" ] || continue
     total=$((total + 1))
 
@@ -53,7 +53,7 @@ for test_file in tests/invalid/*; do
     status=$?
 
     if [ $status -ne 0 ]; then
-        echo "[PASS] $test_file (Corrected rejected)"
+        echo "[PASS] $test_file (Correctly rejected)"
         passed=$((passed + 1))
     else
         echo "[FAIL] $test_file (Expected error, but parser accepted)"

@@ -1,4 +1,5 @@
 %{
+#include <string.h> // will this inclusion fix segfaults (139)?
 #include "parser.tab.h"
 %}
 
@@ -24,20 +25,21 @@
 
 "."         {return DOT;}
 
-// defines a literal as any characters or escapes bounded by double quotations
-\"([^\"%]|%x[0-9]+;)*\" {
-    yyval.str = strdup(yytext);
+\"[^\"]*\" {
+    yylval.str = malloc(strlen(yytext) + 1);
+    strcpy(yylval.str, yytext);
     return LITERAL;
 }
 
-// defines range as escaped chars and ^ bounded by brackets
-"["[^\]]*"]"        {
-    yyval.str = strdup(yytext);
+"["[^\]]*"]" {
+    yylval.str = malloc(strlen(yytext) + 1);
+    strcpy(yylval.str, yytext);
     return RANGE;
 }
 
-[a-zA-Z_][a-zA-Z0-9_]*  {
-    yyval.str = strdup(yytext);
+[a-zA-Z_][a-zA-Z0-9_]* {
+    yylval.str = malloc(strlen(yytext) + 1);
+    strcpy(yylval.str, yytext);
     return ID;
 }
 
@@ -47,6 +49,5 @@
     fprintf(stderr, "Unexpected character: %s\n", yytext);
     return 0;
 }
-
 %%
 int yywrap(void) {return 1;}

@@ -14,7 +14,7 @@ int yylex(void);
 /* Tokens */
 %token <str> ID LITERAL RANGE
 %token CONST SLASH AMP NOT OR EQUALS
-%left AMP
+//%left AMP
 %token STAR PLUS QUESTION
 %token LPAREN RPAREN
 %token DOT
@@ -54,7 +54,7 @@ Definition :
 
 /* Boolean and Top Level Operations */
 RootRegex :
-      RootRegex AMP RootRegex { $$ = make_binary(NODE_AMP, $1, $3); }
+      Regex AMP Regex { $$ = make_binary(NODE_AMP, $1, $3); }
     | NOT Regex               { $$ = make_unary(NODE_NOT, $2); }
     | Alt                     { $$ = $1; }
     ;

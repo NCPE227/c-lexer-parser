@@ -5,7 +5,6 @@
 #ifndef LEXERPARSER_AST_H
 #define LEXERPARSER_AST_H
 
-
 typedef struct AST AST;
 
 struct AST {
@@ -48,6 +47,14 @@ struct AST {
     } data;
 };
 
-extern AST *ast_root;
+// Function Prototypes
+AST *make_binary(int tag, AST *left, AST *right);
+AST *make_unary(int tag, AST *child);
+AST *make_string(int tag, char *val);
+AST *make_def(int tag, char *name, AST *regex);
+AST *top_level(int tag, AST *def_list, AST *root_regex);
+
+void check_semantics(AST *node);
+extern AST *ast_root; // Tells everyone this variable exists somewhere!
 
 #endif //LEXERPARSER_AST_H

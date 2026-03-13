@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    // CRITICAL: Exit immediately if a syntax error occurs!
+    // Exit immediately if a syntax error occurs
     if (yyparse() != 0) {
         return 1;
     }

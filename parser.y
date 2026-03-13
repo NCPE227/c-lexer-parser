@@ -86,7 +86,7 @@ Term :
     | RANGE                   { $$ = make_string(NODE_RANGE, $1); }
     | DOT                     { $$ = make_unary(NODE_DOT, NULL); }
     | Substitute              { $$ = $1; }
-    | LPAREN RootRegex RPAREN { $$ = $2; }
+    | LPAREN Regex RPAREN { $$ = $2; }
     ;
 
 Substitute :

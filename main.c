@@ -21,13 +21,26 @@ int main(int argc, char **argv) {
 
     // If we survived parsing, check semantics
     if (ast_root != NULL) {
-        //check_semantics(ast_root);
-
         // splitting semantic check into two groups, check push_symbol and NODE_DEF first, then validate VAR_REFs and escapes
         collect_definitions(ast_root);
         check_semantics(ast_root);
+
+        // Open the output file
+        FILE *out = fopen("rexec.c", "w");
+        if (!out) { perror("rexec.c"); return 1; }
+
+        // Write C headers and main function for the generated file
+        fprintf(out, "#inlcude <stdio.h>\n");
+        fprintf(out, "#inlcude <string.h>\n\n");
+
+        // Generate matching functions for each definition
+        generate_code(ast_root, out);
+
+        fclose(out);
     }
 
-    printf("accepts\n");
+
+
+    //printf("accepts\n");
     return 0;
 }

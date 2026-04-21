@@ -1,0 +1,8 @@
+// A depends on B
+const A = / "start" ${B} /
+
+// B depends on A
+const B = / ${A} "end" /
+
+// Root attempts to expand A, which triggers B, which triggers A...
+/ ${A} /

@@ -55,6 +55,8 @@ AST *make_def(int tag, char *name, AST *regex);
 AST *top_level(int tag, AST *def_list, AST *root_regex);
 
 void check_semantics(AST *node);
+void collect_definitions(AST *node);
+int contains_var(AST *node, char *name);
 extern AST *ast_root; // Tells everyone this variable exists somewhere!
 
 #endif //LEXERPARSER_AST_H

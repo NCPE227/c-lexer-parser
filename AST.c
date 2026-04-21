@@ -6,6 +6,7 @@
 
 #include "AST.h"
 
+#include <ctype.h>
 #include <string.h>
 
 AST *ast_root = NULL;
@@ -118,6 +119,12 @@ void validate_escapes(char *str) {
 
         char *end_pointer;
 
+        // Check if the character immediately following %x is a hex digit
+        if (!isxdigit(current[0])) {
+            fprintf(stderr, "Semantics Error: Invalid hex format at %s\n", current-2);
+            exit(1);
+        }
+
         // convert string to long int. 16 for hex.
         long l_int = strtol(current, &end_pointer, 16);
 
@@ -131,6 +138,7 @@ void validate_escapes(char *str) {
     }
 }
 
+/*
 void check_semantics(AST *node) {
     if (node == NULL) return;
 
@@ -188,3 +196,107 @@ void check_semantics(AST *node) {
 
     }
 }
+*/
+
+void check_semantics(AST *node) {
+    if (node == NULL) return;
+
+    switch (node->tag) {
+        case NODE_SYSTEM:
+            check_semantics(node->data.system.def_list);
+            if (node->data.system.root_regex != NULL) {
+                check_semantics(node->data.system.root_regex);
+            }
+            break;
+
+        case NODE_DEF:
+            // Now we ONLY check the right side (the regex) [cite: 12]
+            // push_symbol has already been handled by Phase 1
+
+            // Hopefully stops circular references
+            if (contains_var(node->data.def.regex, node->data.def.name)) {
+                fprintf(stderr, "Semantic Error: Circular reference in '%s'\n", node->data.def.name);
+                exit(1);
+            }
+            check_semantics(node->data.def.regex);
+            break;
+
+        // Semantic Checks
+        case NODE_VAR_REF:
+            if (find_symbol(node->data.string.value) == 0) {
+                fprintf(stderr, "Semantic Error: Unbound variable '${%s}'\n", node->data.string.value);
+                exit(1);
+            }
+            break;
+
+        // Strings
+        case NODE_LITERAL:
+        case NODE_RANGE:
+            validate_escapes(node->data.string.value);
+            break;
+
+        // Recursive tree walking for operations
+        case NODE_SEQ:
+        case NODE_ALT:
+        case NODE_AMP:
+            check_semantics(node->data.binary.left);
+            check_semantics(node->data.binary.right);
+            break;
+
+        // Operations
+        case NODE_STAR:
+        case NODE_PLUS:
+        case NODE_QUESTION:
+        case NODE_NOT:
+            check_semantics(node->data.unary.child);
+            break;
+
+        // Don't do anything
+        case NODE_DOT:
+            break;
+
+    }
+}
+
+// Run first: only collect names into the symbol table
+void collect_definitions(AST *node) {
+    if (node == NULL) return;
+
+    switch (node->tag) {
+        case NODE_SYSTEM:
+            // Only look at the definition list part of the system
+            collect_definitions(node->data.system.def_list);
+            break;
+
+        case NODE_SEQ:
+            // Recurse through the list of definitions [cite: 10, 19]
+            collect_definitions(node->data.binary.left);
+            collect_definitions(node->data.binary.right);
+            break;
+
+        case NODE_DEF:
+            // Register the name immediately [cite: 12]
+            push_symbol(node->data.def.name);
+            break;
+
+        default:
+            // Ignore other nodes (Regex, Lit, etc.) in this pass
+            break;
+    }
+}
+
+int contains_var(AST *node, char *name) {
+    if (node == NULL) return 0;
+    if (node->tag == NODE_VAR_REF) {
+        return strcmp(node->data.string.value, name) == 0;
+    }
+    // Recursive check for all other node types
+    if (node->tag == NODE_SEQ || node->tag == NODE_ALT || node->tag == NODE_AMP) {
+        return contains_var(node->data.binary.left, name) || contains_var(node->data.binary.right, name);
+    }
+    if (node->tag == NODE_STAR || node->tag == NODE_PLUS || node->tag == NODE_QUESTION || node->tag == NODE_NOT) {
+        return contains_var(node->data.unary.child, name);
+    }
+    return 0;
+}
+

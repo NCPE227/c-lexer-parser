@@ -1,0 +1,1 @@
+const pattern_b = / "valid:%x61" | "too_high:%x110000" /

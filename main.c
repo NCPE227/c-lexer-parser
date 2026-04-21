@@ -21,6 +21,10 @@ int main(int argc, char **argv) {
 
     // If we survived parsing, check semantics
     if (ast_root != NULL) {
+        //check_semantics(ast_root);
+
+        // splitting semantic check into two groups, check push_symbol and NODE_DEF first, then validate VAR_REFs and escapes
+        collect_definitions(ast_root);
         check_semantics(ast_root);
     }
 

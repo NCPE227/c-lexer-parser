@@ -1,0 +1,4 @@
+const HexChar = / [0-9] | [a-f] /
+const HexPair = / ${HexChar} ${HexChar} /
+
+/ ${HexPair} ":" ${HexPair} ":" ${HexPair} /

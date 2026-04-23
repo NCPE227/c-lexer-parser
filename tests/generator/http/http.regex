@@ -1,0 +1,4 @@
+const Method = / "GET" | "POST" | "DELETE" /
+const Path = / "/" [a-z]+ /
+
+/ ${Method} " " ${Path} /

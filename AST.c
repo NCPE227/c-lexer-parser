@@ -299,4 +299,3 @@ int contains_var(AST *node, char *name) {
     }
     return 0;
 }
-

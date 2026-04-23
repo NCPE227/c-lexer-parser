@@ -33,9 +33,6 @@ int main(int argc, char **argv) {
         fprintf(out, "#inlcude <stdio.h>\n");
         fprintf(out, "#inlcude <string.h>\n\n");
 
-        // Generate matching functions for each definition
-        generate_code(ast_root, out);
-
         fclose(out);
     }
 

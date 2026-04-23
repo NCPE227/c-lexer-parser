@@ -1,2 +1,2 @@
-const Filename = /[a-z]/
-/${Filename} & .+ ".txt"/
+const Filename = /[a-z]+/
+/${Filename} ".txt"/

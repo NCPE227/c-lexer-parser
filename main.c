@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "AST.h"
 #include "parser.tab.h"
+#include "generators.h"
 
 extern FILE *yyin;
 
@@ -29,9 +30,8 @@ int main(int argc, char **argv) {
         FILE *out = fopen("rexec.c", "w");
         if (!out) { perror("rexec.c"); return 1; }
 
-        // Write C headers and main function for the generated file
-        fprintf(out, "#inlcude <stdio.h>\n");
-        fprintf(out, "#inlcude <string.h>\n\n");
+        // Use fancy new generator system to build the file
+        generate_system(ast_root, out);
 
         fclose(out);
     }

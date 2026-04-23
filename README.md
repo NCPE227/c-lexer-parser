@@ -7,7 +7,7 @@ usage on other systems may result in your mileage varying.
 - [Bison](https://github.com/akimd/bison)
 - C programming language
 
-# Operation
+# Operation - Parser
 You can build the executable by running `make` from the root folder. Once you've done that,
 you can use the tool from the command line like so: `./parse <path_to_file>`. It will likely
 require elevated user status.
@@ -15,6 +15,14 @@ require elevated user status.
 If you'd like to perform a bulk test, a bash script is included in the project along with a suite of valid and invalid
 regular expressions. Running `bash test.sh` will run and output all test values. This is done automatically, and will
 even generate your executable if it doesn't already exist. If you add more tests, it should pick those up automatically.
+
+# Operation - Code Generation
+Makefile now has two additional functions: `make generate` and `make rexec`. The former creates an executable called `generate`
+which you can run with a regex or text file to create a C file called `rexec.c`. Compiling that file with `make rexec` provides an
+executable which prints "accepts" or "rejects" when a provided file either meets or does not meet criteria for its specification.
+
+Three tests are provided: HTTP formatting, Log (! and . operators), and hexadecimal formatting. Run `./generate tests/generator/<folder>/<file>.regex`
+to create the rexec.c file, then run `make rexec` and finally `./rexec tests/generator/<folder>/<file>_pass.txt` or `./rexec tests/generator/<folder>/<file>_fail.txt`.
 
 # Licensure
 This project is licensed under [GNU 3.0](https://www.gnu.org/licenses/gpl-3.0.en.html) and is provided "AS IS".
